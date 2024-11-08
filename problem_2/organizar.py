@@ -14,27 +14,66 @@
 # cronologicamente. Despues, queremos imprimirlos a la pantalla.
 
 import os
+from typing import List
 
-def organizar():
-    error_file_path = './refactoring/problema2/data/error.log'
+# Constants
+ERROR_LOG_PATH = './data/error.log'
+SEVERITY_THRESHOLD = 50
 
-    with open(error_file_path, 'r') as f:
-        errores = []
-        
-        lineas = f.readlines()
-        lineas = [line.rstrip().split(' ') for line in lineas]
+class LogEntry:
+    """Class representing a log entry."""
+    def __init__(self, log_type: str, time: int, message: str, severity: int = None):
+        self.log_type = log_type
+        self.time = time
+        self.message = message
+        self.severity = severity
 
-        for linea in lineas:
-            if linea[0] == 'E' and int(linea[1]) > 50:
-                errores.append(linea)
+    def __str__(self):
+        if self.severity is not None:
+            return f"{self.log_type} {self.severity} {self.time} {self.message}"
+        return f"{self.log_type} {self.time} {self.message}"
 
-        errores.sort(key=lambda x: int(x[2]))
+def parse_log_line(line: str) -> LogEntry:
+    """Parse a line of the log file and return a LogEntry object."""
+    parts = line.strip().split(' ')
+    log_type = parts[0]
+    if log_type == 'E':
+        severity = int(parts[1])
+        time = int(parts[2])
+        message = ' '.join(parts[3:])
+        return LogEntry(log_type, time, message, severity)
+    else:
+        time = int(parts[1])
+        message = ' '.join(parts[2:])
+        return LogEntry(log_type, time, message)
 
-        for error in errores:
-            print(' '.join(error))
+def filter_severe_errors(entries: List[LogEntry], severity_threshold: int) -> List[LogEntry]:
+    """Filter for severe errors above a given severity threshold."""
+    return [entry for entry in entries if entry.log_type == 'E' and entry.severity > severity_threshold]
+
+def sort_logs_chronologically(entries: List[LogEntry]) -> List[LogEntry]:
+    """Sort log entries chronologically by time."""
+    return sorted(entries, key=lambda entry: entry.time)
+
+def process_logs(file_path: str, severity_threshold: int):
+    """Process the log file, filter severe errors, sort, and print them."""
+    severe_errors = []
+
+    with open(file_path, 'r') as f:
+        for line in f:
+            entry = parse_log_line(line)
+            if entry.log_type == 'E' and entry.severity > severity_threshold:
+                severe_errors.append(entry)
+
+    # Sort errors by time
+    sorted_errors = sort_logs_chronologically(severe_errors)
+
+    # Print the sorted severe errors
+    for error in sorted_errors:
+        print(error)
 
 def main():
-    organizar()
+    process_logs(ERROR_LOG_PATH, SEVERITY_THRESHOLD)
 
 if __name__ == '__main__':
     main()
