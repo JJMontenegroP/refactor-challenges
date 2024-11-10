@@ -1,10 +1,10 @@
-package refactoring.problema3;
+package model;
 
 public class Sale {
-    private int saleId;
-    private String saleDate;
-    private int itemId;
-    private int quantity;
+    private final int saleId;
+    private final String saleDate;
+    private final int itemId;
+    private final int quantity;
 
     public Sale(int saleId, String saleDate, int itemId, int quantity) {
         this.saleId = saleId;

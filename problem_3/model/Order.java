@@ -1,10 +1,10 @@
-public package refactoring.problema3;
+package model;
 
 public class Order {
-    private int orderId;
-    private String orderDate;
-    private int itemId;
-    private int quantity;
+    private final int orderId;
+    private final String orderDate;
+    private final int itemId;
+    private final int quantity;
 
     public Order(int orderId, String orderDate, int itemId, int quantity) {
         this.orderId = orderId;
